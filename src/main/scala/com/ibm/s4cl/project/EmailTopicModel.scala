@@ -2,11 +2,8 @@ package com.ibm.s4cl.project
 
 import java.util.Properties
 
-import edu.stanford.nlp.ling.{CoreAnnotations, CoreLabel}
-import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation
-import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
-import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
-import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
+import edu.stanford.nlp.ling.CoreAnnotations
+import edu.stanford.nlp.pipeline._
 import edu.stanford.nlp.util._
 
 
@@ -51,37 +48,36 @@ object EmailTopicModel {
     val props = new Properties()
     props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref")
 
-    /**
     val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
     val annotation: Annotation = pipeline.process(text)
 
-    val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation]).toArray()
-    val tokens = annotation.get(classOf[CoreAnnotations.TokensAnnotation]).toArray()
+    val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
+    val tokens = annotation.get(classOf[CoreAnnotations.TokensAnnotation])
     val nes = annotation.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
     println(sentences)
     println(tokens)
     println(nes)
 
-    for (sentence <- sentences)
+    for (sentence <- sentences.toArray())
       println(sentence)
-    for (token <- tokens)
-      println(token)**/
+    for (token <- tokens.toArray())
+      println(token)
 
 
 
     val pipe2 = new StanfordCoreNLP(props)
-    val document = new Annotation(text)
+    val document: Annotation = new Annotation(text)
     pipe2.annotate(document)
 
-    val sentences2 = document.get(classOf[CoreAnnotations.SentencesAnnotation])
-    //val tokens2 = annotation.get(classOf[CoreAnnotations.TokensAnnotation])
-    //val nes2 = annotation.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
+    val sentences2 = document.get(classOf[(CoreAnnotations.SentencesAnnotation)])
+    val tokens2 = document.get(classOf[CoreAnnotations.TokensAnnotation])
+    val nes2 = document.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
 
-    for (sentence <- sentences2) {
+    for (sentence <- sentences2.toArray()) {
 
       println(sentence)
 
-      for (token: CoreLabel <- sentence)
+      /**for (token <- sentence.toString)
         {
           val word = token.get(classOf[CoreAnnotations.TextAnnotation])
           println(word)
@@ -91,7 +87,7 @@ object EmailTopicModel {
 
           val ne = token.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
           println(ne)
-        }
+        }**/
     }
 
 
