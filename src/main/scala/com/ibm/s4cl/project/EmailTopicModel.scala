@@ -1,12 +1,6 @@
 package com.ibm.s4cl.project
 
-import java.util.Properties
-
-import edu.stanford.nlp.ling.CoreAnnotations
-import edu.stanford.nlp.pipeline._
-import edu.stanford.nlp.util._
-
-
+import edu.stanford.nlp.simple._
 
 /**
   *
@@ -14,25 +8,6 @@ import edu.stanford.nlp.util._
 object EmailTopicModel {
 
   def main(args: Array[String]) {
-    //println("Hello group member!")
-
-    /**val props = new Properties()
-    props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref")
-
-    val pipeline = new StanfordCoreNLP(props)
-
-    val text = "The fate of Lehman Brothers," +
-      "the beleaguered investment bank, hung in the" +
-      "balance on Sunday as Federal Reserve officials and" +
-      "the leaders of major financial institutions continued to" +
-      "gather in emergency meetings trying to complete a plan to rescue" +
-      "the stricken bank.  Several possible plans emerged from the talks," +
-      "held at the Federal Reserve Bank of New York and led by Timothy R. Geithner," +
-      "the president of the New York Fed, and Treasury Secretary Henry M. Paulson Jr."
-
-    val document = new Annotation(text)
-
-    pipeline.annotate(document)**/
 
     val text = "I hope you've been well." +
       "Following up on the Secretary's request, " +
@@ -45,58 +20,24 @@ object EmailTopicModel {
       "than ever, the government does have positive programs and " +
       "policies that would generate good will if people knew about them."
 
-    val props = new Properties()
-    props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref")
-
-    val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
-    val annotation: Annotation = pipeline.process(text)
-
-    val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
-    val tokens = annotation.get(classOf[CoreAnnotations.TokensAnnotation])
-    val nes = annotation.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
-    println(sentences)
-    println(tokens)
-    println(nes)
-
-    for (sentence <- sentences.toArray())
-      println(sentence)
-    for (token <- tokens.toArray())
-      println(token)
+    val sent: Sentence = new Sentence(text)
+    val tokens = sent.words().toArray()
+    val nerTags = sent.nerTags().toArray()
+    val POSTags = sent.posTags().toArray()
 
 
+    println(tokens.length)
+    println(nerTags.length)
+    println(POSTags.length)
 
-    val pipe2 = new StanfordCoreNLP(props)
-    val document: Annotation = new Annotation(text)
-    pipe2.annotate(document)
+    for (i <- 0 until tokens.length)
+      println(tokens(i), POSTags(i), nerTags(i))
 
-    val sentences2 = document.get(classOf[(CoreAnnotations.SentencesAnnotation)])
-    val tokens2 = document.get(classOf[CoreAnnotations.TokensAnnotation])
-    val nes2 = document.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
+    print("\nNamed Entities: ")
+    for (i <- 0 until tokens.length)
+      if (!nerTags(i).equals("O"))
+        println(tokens(i), nerTags(i))
 
-    for (sentence <- sentences2.toArray()) {
-
-      println(sentence)
-
-      /**for (token <- sentence.toString)
-        {
-          val word = token.get(classOf[CoreAnnotations.TextAnnotation])
-          println(word)
-
-          val pos = token.get(classOf[CoreAnnotations.PartOfSpeechAnnotation])
-          println(pos)
-
-          val ne = token.get(classOf[CoreAnnotations.NamedEntityTagAnnotation])
-          println(ne)
-        }**/
-    }
-
-
-    //println(sentences2)
-    //println(tokens2)
-    //println(nes2)
-
-
-    //println(annotation)
   }
 
 }
