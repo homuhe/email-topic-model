@@ -2,9 +2,6 @@ package com.ibm.s4cl.project
 
 import edu.stanford.nlp.simple._
 
-/**
-  *
-  */
 object EmailTopicModel {
 
   def main(args: Array[String]) {
