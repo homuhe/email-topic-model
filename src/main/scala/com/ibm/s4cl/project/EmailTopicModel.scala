@@ -45,7 +45,6 @@ object EmailTopicModel {
       if (!nerTags(i).equals("O"))
         println(tokens(i), nerTags(i))
 
-    //map token(s) -> nerTag
     //fasst multi-token named entities zu einem einzelnen String zusammen
     val multiNEs: Map[String, String] = {
       var ne = ""
