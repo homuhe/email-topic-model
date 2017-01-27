@@ -28,21 +28,16 @@
       <artifactId>scala-library</artifactId>
       <version>${scala.version}</version>
     </dependency>
-
     <dependency>
-      <groupId>org.clulab</groupId>
-      <artifactId>processors-corenlp_2.11</artifactId>
-      <version>6.0.1</version>
+      <groupId>edu.stanford.nlp</groupId>
+      <artifactId>stanford-corenlp</artifactId>
+      <version>3.7.0</version>
     </dependency>
     <dependency>
-      <groupId>org.clulab</groupId>
-      <artifactId>processors-main_2.11</artifactId>
-      <version>6.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.clulab</groupId>
-      <artifactId>processors-models_2.11</artifactId>
-      <version>6.0.1</version>
+      <groupId>edu.stanford.nlp</groupId>
+      <artifactId>stanford-corenlp</artifactId>
+      <version>3.7.0</version>
+      <classifier>models</classifier>
     </dependency>
 
     <!-- Test -->
