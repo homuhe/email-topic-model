@@ -22,8 +22,7 @@ class Email(file:String) extends scala.Serializable {
   private val adressermail = emailAsText(0)
   private val adresseemail = emailAsText(2)
 
-  val contentwords = getContentNouns
-  val namedEntities = getNamedEntities(contentwords)
+  val(namedEntities, contentwords) = getNamedEntitiysAndNouns
 
   def getAdresser: String = this.adresser
 
@@ -75,7 +74,7 @@ object  Email {
         List[File]()
       }
     }
-    val filedir = "/home/neele/Dokumente/ScalaProject/"
+    val filedir = "/home/neele/Downloads/ScalaProject/"
     val files = getListOfFiles(filedir)
     var counter = 0
     val emails = files.foreach{el =>
