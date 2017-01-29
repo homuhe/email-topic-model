@@ -21,11 +21,9 @@ class Email(file:String) extends scala.Serializable {
   private val date = emailAsText(4).replace("DATE# ", "")
   private val adressermail = emailAsText(0)
   private val adresseemail = emailAsText(2)
-  if (content.length < 5){
-    val (namedEntities, contentwords) = (Map(""->""), Set())
-  }else {
-    val (namedEntities, contentwords) = getNamedEntitiysAndNouns
-  }
+
+  val (namedEntities, contentwords) = getNamedEntitiysAndNouns
+
   def getAdresser: String = this.adresser
 
   def getAdressee: String = this.adressee
@@ -37,23 +35,28 @@ class Email(file:String) extends scala.Serializable {
   def getDate: String = this.date
 
   def getNamedEntitiysAndNouns: (List[(String, String)], Set[String]) = {
-      val sentences = content.toString.split(".")
-      def getEntites(sentences: Array[String], namedEntities:List[((String, String))]) :List[(String, String)]= {
-        if(sentences.isEmpty){
-          namedEntities
-        }
-        val sent = new Sentence(sentences.head)
-        val tokens = sent.nerTags().toArray().map(_.toString)
-        val nertags = sent.nerTags().toArray().map(_.toString)
-        val entities = tokens.zip(nertags).toMap.filter(el => el._2.equals("0")).toList
-        getEntites(sentences.tail, namedEntities:::entities)
+      if (content.length < 5){
+        (List(), Set())
       }
-      val entitymap = getEntites(sentences, Nil)
-      val sent = new Sentence(content.toString)
-      val tokens = sent.words().toArray().map(_.toString)
-      val POSTags = sent.posTags().toArray().map(_.toString)
-      val wordtags = tokens.zip(POSTags).toMap.filter(el => el._2 == "NNP" || el._2 == "NN" || el._2 ==  "NNPS" || el._2 == "NNS").keySet
-      (entitymap, wordtags)
+      else {
+        val sentences = content.toString.split(".")
+        def getEntites(sentences: Array[String], namedEntities: List[((String, String))]): List[(String, String)] = {
+          if (sentences.isEmpty) {
+            namedEntities
+          }
+          val sent = new Sentence(sentences.head)
+          val tokens = sent.nerTags().toArray().map(_.toString)
+          val nertags = sent.nerTags().toArray().map(_.toString)
+          val entities = tokens.zip(nertags).toMap.filter(el => el._2.equals("0")).toList
+          getEntites(sentences.tail, namedEntities ::: entities)
+        }
+        val entitymap = getEntites(sentences, Nil)
+        val sent = new Sentence(content.toString)
+        val tokens = sent.words().toArray().map(_.toString)
+        val POSTags = sent.posTags().toArray().map(_.toString)
+        val wordtags = tokens.zip(POSTags).toMap.filter(el => el._2 == "NNP" || el._2 == "NN" || el._2 == "NNPS" || el._2 == "NNS").keySet
+        (entitymap, wordtags)
+      }
     }
 
   def getNamedEntities(nouns: Set[String]):Set[(String, String)] = {
