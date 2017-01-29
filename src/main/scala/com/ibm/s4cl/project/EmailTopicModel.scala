@@ -22,6 +22,9 @@ class Email(file:String) extends scala.Serializable {
   private val adressermail = emailAsText(0)
   private val adresseemail = emailAsText(2)
 
+  val contentwords = getContentNouns
+  val namedEntities = getNamedEntities(contentwords)
+
   def getAdresser: String = this.adresser
 
   def getAdressee: String = this.adressee
@@ -42,20 +45,18 @@ class Email(file:String) extends scala.Serializable {
       val wordtags = tokens.zip(POSTags).toMap.filter(el => el._2.equals("NNP")).keySet
       (entitymap, wordtags)
     }
-  def getnamedEntities : Map[String, String]= {
-    val sent = new Sentence(content.toString)
-    val tokens = sent.words().toArray().map(_.toString)
-    val nes = sent.nerTags().toArray().map(_.toString)
-    val entities = tokens.zip(nes).toMap.filter(el => el._2.equals("0"))
-    entities
+
+  def getNamedEntities(nouns: Set[String]):Set[(String, String)] = {
+    val ners = nouns.map(noun => (noun, (new Sentence(noun).nerTags()).get(0)))
+    ners
   }
+
   def getContentNouns: Set[String] = {
     if (content.length > 5) {
-
       val sent = new Sentence(content)
       val tokens = sent.words().toArray().map(_.toString)
       val tags = sent.posTags().toArray().map(_.toString)
-      tokens.zip(tags).toMap.filter(el => el._2.equals("NNP")).keySet
+      tokens.zip(tags).toMap.filter(el => el._2 == "NNP" || el._2 == "NN" || el._2 ==  "NNPS" || el._2 == "NNS").keySet
     }
     else {
       Set()
@@ -76,7 +77,11 @@ object  Email {
     }
     val filedir = "/home/neele/Dokumente/ScalaProject/"
     val files = getListOfFiles(filedir)
-    val emails = files.map(el => new Email(el.toString))
+    var counter = 0
+    val emails = files.foreach{el =>
+      new Email(el.toString)
+      println(counter)
+    counter+=1}
     val out = new FileOutputStream("/home/neele/Dokumente/Wikimails")
     val objectout = new ObjectOutputStream(out)
     objectout.writeObject(emails)
