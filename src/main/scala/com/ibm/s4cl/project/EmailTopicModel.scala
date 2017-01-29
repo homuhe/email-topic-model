@@ -14,7 +14,7 @@ class Email(file:String) extends scala.Serializable {
   private val adressee = emailAsText(3).replace("TO-NAME# ", "")
 
   private val content: String = {
-    emailAsText(emailAsText.indexOf("TEXT-CONTENT# ") + 1)
+    emailAsText(emailAsText.indexOf("TEXT-CONTENT# ") + 1).trim
   }
 
   private val subject = emailAsText(5).replace("SUBJECT# ", "")
@@ -77,7 +77,7 @@ object  Email {
     val filedir = "/home/neele/Downloads/ScalaProject/"
     val files = getListOfFiles(filedir)
     var counter = 0
-    val emails = files.foreach{el =>
+    val emails = files.par.foreach{el =>
       new Email(el.toString)
       println(counter)
     counter+=1}
