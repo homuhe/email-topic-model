@@ -7,6 +7,8 @@ package com.ibm.s4cl.project
 import scala.io.Source
 import java.io._
 import edu.stanford.nlp.simple._
+
+@SerialVersionUID(100L)
 class Email(file:String) extends scala.Serializable {
   val emailAsText = Source.fromFile(file).getLines().toSeq
   private val numberOfMeta = emailAsText.count(el => el.contains("META"))
@@ -22,7 +24,10 @@ class Email(file:String) extends scala.Serializable {
   private val adressermail = emailAsText(0)
   private val adresseemail = emailAsText(2)
 
-  val (namedEntities, contentwords) = getNamedEntitiysAndNouns
+  //val (namedEntities, contentwords) = getNamedEntities
+  val contenNouns = getContentNouns
+  val namedEntities = getNamedEntities(contenNouns)
+  def getMentionedPersons : Set[(String, String)] = namedEntities.filter(el => el._2 == "PERSON")
 
   def getAdresser: String = this.adresser
 
@@ -34,45 +39,21 @@ class Email(file:String) extends scala.Serializable {
 
   def getDate: String = this.date
 
-  def getNamedEntitiysAndNouns: (List[(String, String)], Set[String]) = {
-      if (content.length < 5){
-        (List(), Set())
-      }
-      else {
-        val sentences = content.toString.split(".")
-        def getEntites(sentences: Array[String], namedEntities: List[((String, String))]): List[(String, String)] = {
-          if (sentences.isEmpty) {
-            namedEntities
-          }
-          val sent = new Sentence(sentences.head)
-          val tokens = sent.nerTags().toArray().map(_.toString)
-          val nertags = sent.nerTags().toArray().map(_.toString)
-          val entities = tokens.zip(nertags).toMap.filter(el => el._2.equals("0")).toList
-          getEntites(sentences.tail, namedEntities ::: entities)
-        }
-        val entitymap = getEntites(sentences, Nil)
-        val sent = new Sentence(content.toString)
-        val tokens = sent.words().toArray().map(_.toString)
-        val POSTags = sent.posTags().toArray().map(_.toString)
-        val wordtags = tokens.zip(POSTags).toMap.filter(el => el._2 == "NNP" || el._2 == "NN" || el._2 == "NNPS" || el._2 == "NNS").keySet
-        (entitymap, wordtags)
-      }
-    }
 
-  def getNamedEntities(nouns: Set[String]):Set[(String, String)] = {
+  def getNamedEntities(nouns: List[String]):Set[(String, String)] = {
     val ners = nouns.map(noun => (noun, (new Sentence(noun).nerTags()).get(0)))
-    ners
+    ners.toSet.filter(el => el._2.equals("O") == false)
   }
 
-  def getContentNouns: Set[String] = {
+  def getContentNouns: List[String] = {
     if (content.length > 5) {
       val sent = new Sentence(content)
       val tokens = sent.words().toArray().map(_.toString)
       val tags = sent.posTags().toArray().map(_.toString)
-      tokens.zip(tags).toMap.filter(el => el._2 == "NNP" || el._2 == "NN" || el._2 ==  "NNPS" || el._2 == "NNS").keySet
+      tokens.zip(tags).toMap.toList.filter(el => el._2 == "NNP" || el._2 == "NN" || el._2 ==  "NNPS" || el._2 == "NNS").map(el => el._1)
     }
     else {
-      Set()
+      List()
     }
   }
 }
@@ -88,16 +69,18 @@ object  Email {
         List[File]()
       }
     }
-    val filedir = "/home/neele/Dokumente/ScalaProject/"
+    val filedir = "/home/neele/Schreibtisch/ScalaProject/"
     val files = getListOfFiles(filedir)
     var counter = 0
-    val emails = files.par.foreach{el =>
-      new Email(el.toString)
+    val emails = scala.collection.mutable.ListBuffer[Email]()
+   files.foreach{el =>
+      emails.append(new Email(el.toString))
       println(counter)
     counter+=1}
+    println(emails.toList.length)
     val out = new FileOutputStream("/home/neele/Dokumente/Wikimails")
     val objectout = new ObjectOutputStream(out)
-    objectout.writeObject(emails)
+    objectout.writeObject(emails.toList)
     objectout.close()
     out.close()
     println("emails have been read")
