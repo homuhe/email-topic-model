@@ -41,7 +41,7 @@ class Email(file:String) extends scala.Serializable {
       val nerTags = sent.nerTags().toArray().map(_.toString)
       val POSTags = sent.posTags().toArray().map(_.toString)
       val entitymap = tokens.zip(nerTags).toMap.filter(el => el._2.equals("0"))
-      val wordtags = tokens.zip(POSTags).toMap.filter(el => el._2.equals("NNP")).keySet
+      val wordtags = tokens.zip(POSTags).toMap.filter(el => el._2 == "NNP" || el._2 == "NN" || el._2 ==  "NNPS" || el._2 == "NNS").keySet
       (entitymap, wordtags)
     }
 
