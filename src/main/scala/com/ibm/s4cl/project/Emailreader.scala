@@ -6,6 +6,30 @@ package com.ibm.s4cl.project
 import java.io.{FileInputStream, ObjectInputStream}
 import edu.stanford.nlp.simple._
 class emailreader(emails: List[Email]){
+  def getNounsOverTime: scala.collection.mutable.Map[String, Set[String]] = {
+    val timemap = scala.collection.mutable.Map[String, Set[String]]()
+    emails.foreach { email =>
+      val time = email.getDate
+      val nouns = email.contenNouns.toSet
+      val value = timemap.getOrElse(time, Set())
+      val newvalue = value.union(nouns)
+      timemap.update(time, newvalue)
+    }
+    println("ready")
+    timemap
+  }
+  def getPersonsMentionedWithTopics: scala.collection.mutable.Map[String, Set[(String, String)]] = {
+    val personmap = scala.collection.mutable.Map[String, Set[(String, String)]]()
+    emails.foreach { email =>
+      val persons = email.getMentionedPersons.map(el => el._1)
+      val topics = email.namedEntities
+      persons.foreach { person =>
+        val value: Set[(String, String)] = personmap.getOrElse(person.toString, Set())
+        personmap.update(person, value.union(topics))
+      }
+    }
+    personmap
+  }
 
   def getAdresser_TopicMap(person:String) : scala.collection.mutable.Map[String, List[(String, String)]]={
     val adressermap = scala.collection.mutable.Map[String, List[(String, String)]]()
