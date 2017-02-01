@@ -79,7 +79,10 @@ object emailreader {
   def main(args: Array[String]): Unit = {
     import java.io.{FileOutputStream, ObjectOutputStream}
 
-    val in = new FileInputStream("C:\\Users\\Julia\\Dropbox\\SCALA-PROJECT_2017\\Wikimails")
+
+    //the serialized file that has been created beforehand
+//    val in = new FileInputStream("C:\\Users\\Julia\\Dropbox\\SCALA-PROJECT_2017\\Wikimails")
+    val in = new FileInputStream("Wikimails")
     val inObject = new ObjectInputStream(in)
     val newmails = inObject.readObject().asInstanceOf[List[Email]]
     println(newmails.length)
